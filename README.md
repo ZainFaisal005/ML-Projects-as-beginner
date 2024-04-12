@@ -3,3 +3,5 @@ Welcome to my repository of Machine Learning (ML) Projects! Here, you'll find a 
 
 ## **About**
 As a beginner in machine learning, I've embarked on this journey to not only learn the theory behind ML algorithms but also to apply them to real-world problems. Each project in this repository represents a unique problem or dataset that I've tackled using various machine learning techniques.
+
+All projects are very useful for ML beginners 
