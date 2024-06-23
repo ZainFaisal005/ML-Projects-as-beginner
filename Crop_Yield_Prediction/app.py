@@ -1,12 +1,13 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import joblib
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.metrics import mean_absolute_error, mean_squared_error
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 
-# Load the trained model
+# Load the trained ensemble model
 model = joblib.load('best_model.pkl')
 
 # Define numerical and categorical columns
@@ -74,23 +75,26 @@ st.write(f'Mean Absolute Error: {mae:.2f}')
 st.write(f'Mean Squared Error: {mse:.2f}')
 st.markdown("---")
 
-# Extract feature importances from the model
-feature_importances = model.named_steps['randomforestregressor'].feature_importances_
-feature_names = numerical_columns + list(model.named_steps['columntransformer'].named_transformers_['categorical'].named_steps['encode'].get_feature_names_out(categorical_columns))
-
-# Create a DataFrame for feature importances
-importance_df = pd.DataFrame({'Feature': feature_names, 'Importance': feature_importances})
-
-# Sort features by importance
-importance_df = importance_df.sort_values(by='Importance', ascending=False).reset_index(drop=True)
-
-# Display feature importances using a bar plot with improved styling
-st.subheader('Feature Importances')
+# Visualize predictions vs actual values
+st.subheader('Predictions vs Actual Values')
 fig, ax = plt.subplots(figsize=(10, 8))
-sns.barplot(x='Importance', y='Feature', data=importance_df, ax=ax, palette='viridis')
-plt.xlabel('Importance', fontsize=12)
-plt.ylabel('Feature', fontsize=12)
-plt.title('Feature Importances', fontsize=14)
+sns.scatterplot(x=y_test, y=y_pred, ax=ax, color='blue')
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], '--r', linewidth=2)
+plt.xlabel('Actual Values', fontsize=12)
+plt.ylabel('Predicted Values', fontsize=12)
+plt.title('Predictions vs Actual Values', fontsize=14)
+plt.xticks(fontsize=10)
+plt.yticks(fontsize=10)
+st.pyplot(fig)
+
+# Display residuals
+st.subheader('Residuals')
+residuals = y_test - y_pred
+fig, ax = plt.subplots(figsize=(10, 8))
+sns.histplot(residuals, kde=True, ax=ax, color='green')
+plt.xlabel('Residuals', fontsize=12)
+plt.ylabel('Frequency', fontsize=12)
+plt.title('Residuals Distribution', fontsize=14)
 plt.xticks(fontsize=10)
 plt.yticks(fontsize=10)
 st.pyplot(fig)
